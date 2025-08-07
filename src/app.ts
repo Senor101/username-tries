@@ -1,7 +1,11 @@
-import fastify from "fastify";
+import Fastify from "fastify";
 
-const fastifyApp = fastify({
+const fastifyApp = Fastify({
   logger: true,
+});
+
+fastifyApp.get("/", async (request, reply) => {
+  return { message: "Hello, World!" };
 });
 
 async function startServer() {
