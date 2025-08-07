@@ -1,9 +1,9 @@
 class TrieNode {
-  children: Map<string, TrieNode>;
+  children: Record<string, TrieNode>;
   isEnd: boolean;
 
   constructor() {
-    this.children = new Map();
+    this.children = {};
     this.isEnd = false;
   }
 }
@@ -22,10 +22,10 @@ class Trie {
   insert(word: string): void {
     let node = this.root;
     for (const char of word) {
-      if (!node.children.has(char)) {
-        node.children.set(char, new TrieNode());
+      if (!node.children[char]) {
+        node.children[char] = new TrieNode();
       }
-      node = node.children.get(char)!; // Non-null assertion since we just checked existence
+      node = node.children[char];
     }
     node.isEnd = true;
   }
@@ -38,10 +38,10 @@ class Trie {
   find(word: string): TrieNode | null {
     let node = this.root;
     for (const char of word) {
-      if (!node.children.has(char)) {
+      if (!node.children[char]) {
         return null;
       }
-      node = node.children.get(char)!;
+      node = node.children[char];
     }
     return node;
   }
@@ -73,15 +73,16 @@ class Trie {
    */
   autoComplete(prefix: string, limit = 5): string[] {
     const node = this.find(prefix);
-    console.depth({ node });
+
     const results: string[] = [];
 
     const dfs = (currentNode: TrieNode, path: string) => {
-      if (results.length >= limit) return;
+      if (results.length >= limit) return; // ultimate limit check
 
-      if (currentNode.isEnd) results.push(prefix + path);
+      if (currentNode.isEnd) results.push(prefix + path); // if we reach end, push the word to results
 
       for (const [char, childNode] of Object.entries(currentNode.children)) {
+        console.log(`Traversing: ${path}${char}`);
         dfs(childNode, path + char);
       }
     };
