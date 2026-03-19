@@ -1,15 +1,42 @@
-import Fastify from "fastify";
+import Fastify from 'fastify';
+
+import { appConfig } from './configs/env';
+import { initializeDatabase } from './db/init';
+import { dbPool } from './db/pool';
+import usernameRoutes from './routes/username.routes';
 
 const fastifyApp = Fastify({
   logger: true,
 });
 
-fastifyApp.get("/", async (request, reply) => {
-  return { message: "Hello, World!" };
+fastifyApp.get('/', async (request, reply) => {
+  return { message: 'Hello, Nepal!' };
 });
 
+fastifyApp.register(usernameRoutes);
+
 async function startServer() {
-  await fastifyApp.listen({ port: 3000, host: "localhost" });
+  await initializeDatabase();
+  await fastifyApp.listen({ port: appConfig.port, host: appConfig.host });
 }
 
-startServer();
+async function closeServer(): Promise<void> {
+  await fastifyApp.close();
+  await dbPool.end();
+}
+
+startServer().catch(async (error: unknown) => {
+  fastifyApp.log.error(error);
+  await closeServer();
+  process.exit(1);
+});
+
+process.on('SIGINT', async (): Promise<void> => {
+  await closeServer();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async (): Promise<void> => {
+  await closeServer();
+  process.exit(0);
+});

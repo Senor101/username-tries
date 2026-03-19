@@ -52,7 +52,7 @@ class Trie {
    * @return {boolean}
    */
   search(word: string): boolean {
-    let node = this.find(word);
+    const node = this.find(word);
     return node !== null && node.isEnd;
   }
 
