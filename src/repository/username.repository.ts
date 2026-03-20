@@ -19,11 +19,20 @@ export class UsernameRepository {
     return this.toUsername(rows[0]);
   }
 
-  static async fetchAllUsernames() {
+  static async findAllUsernames() {
     const { rows } = await dbPool.query<UsernameModel>(
       'SELECT id, username, created_at FROM usernames ORDER BY created_at ASC',
     );
 
     return rows.map(this.toUsername);
+  }
+
+  static async findByUsername(username: string) {
+    const { rows } = await dbPool.query<UsernameModel>(
+      'SELECT id, username, created_at FROM usernames WHERE username = $1',
+      [username],
+    );
+
+    return rows.length > 0 ? this.toUsername(rows[0]) : null;
   }
 }

@@ -18,7 +18,7 @@ export interface CreateUsernameRoute {
 }
 
 export interface ListUsernamesRoute {
-  Reply: Username[];
+  Reply: { message: string; data: Username[] } | ErrorResponse;
 }
 
 export interface UsernameModel {

@@ -1,0 +1,1 @@
+export { userNameTrie } from './trie';

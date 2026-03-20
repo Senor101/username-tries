@@ -88,7 +88,7 @@ class Trie {
     };
 
     if (node) {
-      dfs(node, "");
+      dfs(node, '');
     }
 
     return results;
@@ -103,14 +103,4 @@ class Trie {
   }
 }
 
-const trie1 = new Trie();
-
-trie1.insert("hello");
-trie1.insert("hell");
-trie1.insert("heaven");
-trie1.insert("heavy");
-trie1.insert("hero");
-
-// console.dir(trie1, { depth: null }); // ["hello", "hell", "heaven"]
-
-console.log(trie1.autoComplete("he")); // true
+export const userNameTrie = new Trie();
