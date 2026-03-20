@@ -5,7 +5,7 @@ import { createUsername, getAllUsernames } from '../services/username.service';
 import type {
   CreateUsernameRoute,
   ListUsernamesRoute,
-} from '../interface/username';
+} from '../interface/username.interface';
 
 function isUniqueViolation(error: unknown): error is DatabaseError {
   if (error === null || typeof error !== 'object') {

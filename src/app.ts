@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 
 import { appConfig } from './configs/env';
 import { initializeDatabase } from './db/init';
@@ -10,12 +10,15 @@ const fastifyApp = Fastify({
   logger: true,
 });
 
-fastifyApp.get('/health', async (request, reply) => {
-  return { message: 'Hello, Nepal!' };
-});
+fastifyApp.get(
+  '/health',
+  async (request: FastifyRequest, reply: FastifyReply) => {
+    reply.status(200).send({ status: 'ok' });
+  },
+);
 
 fastifyApp.register(clientPlugin);
-fastifyApp.register(usernameRoutes);
+fastifyApp.register(usernameRoutes, { prefix: '/api/v1' });
 
 async function startServer() {
   await initializeDatabase();

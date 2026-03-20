@@ -20,3 +20,9 @@ export interface CreateUsernameRoute {
 export interface ListUsernamesRoute {
   Reply: Username[];
 }
+
+export interface UsernameModel {
+  id: number;
+  username: string;
+  created_at: Date;
+}

@@ -7,7 +7,7 @@ import {
 import type {
   CreateUsernameRoute,
   ListUsernamesRoute,
-} from '../interface/username';
+} from '../interface/username.interface';
 
 const usernameRoutes: FastifyPluginAsync = async (fastify): Promise<void> => {
   fastify.post<CreateUsernameRoute>('/usernames', createUsernameHandler);
