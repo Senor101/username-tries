@@ -3,16 +3,18 @@ import Fastify from 'fastify';
 import { appConfig } from './configs/env';
 import { initializeDatabase } from './db/init';
 import { dbPool } from './db/pool';
+import clientPlugin from './plugins/client.plugin';
 import usernameRoutes from './routes/username.routes';
 
 const fastifyApp = Fastify({
   logger: true,
 });
 
-fastifyApp.get('/', async (request, reply) => {
+fastifyApp.get('/health', async (request, reply) => {
   return { message: 'Hello, Nepal!' };
 });
 
+fastifyApp.register(clientPlugin);
 fastifyApp.register(usernameRoutes);
 
 async function startServer() {
