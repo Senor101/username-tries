@@ -21,6 +21,22 @@ export interface ListUsernamesRoute {
   Reply: { message: string; data: Username[] } | ErrorResponse;
 }
 
+export interface CheckUsernameAvailabilityQuery {
+  username: string;
+}
+
+export interface CheckUsernameAvailabilityData {
+  username: string;
+  available: boolean;
+}
+
+export interface CheckUsernameAvailabilityRoute {
+  Querystring: CheckUsernameAvailabilityQuery;
+  Reply:
+    | { message: string; data: CheckUsernameAvailabilityData }
+    | ErrorResponse;
+}
+
 export interface UsernameModel {
   id: number;
   username: string;

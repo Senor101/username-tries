@@ -1,8 +1,13 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 // import type { DatabaseError } from 'pg';
 
-import { createUsername, getAllUsernames } from '../services/username.service';
+import {
+  createUsername,
+  getAllUsernames,
+  isUsernameAvailable,
+} from '../services/username.service';
 import type {
+  CheckUsernameAvailabilityRoute,
   CreateUsernameRoute,
   ListUsernamesRoute,
 } from '../interface/username.interface';
@@ -47,5 +52,33 @@ export async function listUsernamesHandler(
     });
   } catch (error: unknown) {
     reply.status(500).send({ message: 'failed to retrieve usernames' });
+  }
+}
+
+export async function checkUsernameAvailabilityHandler(
+  request: FastifyRequest<CheckUsernameAvailabilityRoute>,
+  reply: FastifyReply<CheckUsernameAvailabilityRoute>,
+): Promise<void> {
+  try {
+    const normalizedUsername = request.query.username.trim().toLowerCase();
+
+    if (normalizedUsername.length === 0) {
+      reply.status(400).send({ message: 'username query is required' });
+      return;
+    }
+
+    const available = await isUsernameAvailable(normalizedUsername);
+
+    reply.status(200).send({
+      message: 'username availability checked successfully',
+      data: {
+        username: normalizedUsername,
+        available,
+      },
+    });
+  } catch (error: unknown) {
+    reply
+      .status(500)
+      .send({ message: 'failed to check username availability' });
   }
 }
