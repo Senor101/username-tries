@@ -5,6 +5,7 @@ import { initializeDatabase } from './db/init';
 import { dbPool } from './db/pool';
 import clientPlugin from './plugins/client.plugin';
 import usernameRoutes from './routes/username.routes';
+import { hydrateUsernameTrie } from './services/username.service';
 
 const fastifyApp = Fastify({
   logger: true,
@@ -22,6 +23,7 @@ fastifyApp.register(usernameRoutes, { prefix: '/api/v1' });
 
 async function startServer() {
   await initializeDatabase();
+  await hydrateUsernameTrie();
   await fastifyApp.listen({ port: appConfig.port, host: appConfig.host });
 }
 
