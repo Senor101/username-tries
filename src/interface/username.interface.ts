@@ -28,6 +28,7 @@ export interface CheckUsernameAvailabilityQuery {
 export interface CheckUsernameAvailabilityData {
   username: string;
   available: boolean;
+  suggestions: string[];
 }
 
 export interface CheckUsernameAvailabilityRoute {

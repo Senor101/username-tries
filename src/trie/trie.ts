@@ -8,6 +8,21 @@ class TrieNode {
   }
 }
 
+const USERNAME_PATTERN = /^[a-z0-9_.]{3,20}$/;
+const SUGGESTION_SUFFIXES = [
+  'official',
+  'studio',
+  'creative',
+  'writes',
+  'media',
+  'hub',
+  'team',
+  'app',
+  'dev',
+  'lab',
+  'works',
+];
+
 class Trie {
   root: TrieNode;
   constructor() {
@@ -82,7 +97,6 @@ class Trie {
       if (currentNode.isEnd) results.push(prefix + path); // if we reach end, push the word to results
 
       for (const [char, childNode] of Object.entries(currentNode.children)) {
-        console.log(`Traversing: ${path}${char}`);
         dfs(childNode, path + char);
       }
     };
@@ -92,6 +106,122 @@ class Trie {
     }
 
     return results;
+  }
+
+  private sanitizeSuggestionBase(username: string): string {
+    const cleaned = username.replace(/[^a-z0-9_.]/g, '');
+    return cleaned.length > 0 ? cleaned.slice(0, 14) : 'user';
+  }
+
+  private trimTrailingSeparators(value: string): string {
+    return value.replace(/[._]+$/g, '');
+  }
+
+  private appendWithSeparator(
+    base: string,
+    suffix: string,
+    separator: '_' | '.',
+  ): string | null {
+    const maxBaseLength = 20 - separator.length - suffix.length;
+    if (maxBaseLength < 3) {
+      return null;
+    }
+
+    const trimmedBase = this.trimTrailingSeparators(base).slice(
+      0,
+      maxBaseLength,
+    );
+    if (trimmedBase.length < 3) {
+      return null;
+    }
+
+    return `${trimmedBase}${separator}${suffix}`;
+  }
+
+  private appendCompact(base: string, suffix: string): string | null {
+    const compactBase = base.replace(/[._]+/g, '');
+    const maxBaseLength = 20 - suffix.length;
+    if (maxBaseLength < 3) {
+      return null;
+    }
+
+    const trimmedBase = compactBase.slice(0, maxBaseLength);
+    if (trimmedBase.length < 3) {
+      return null;
+    }
+
+    return `${trimmedBase}${suffix}`;
+  }
+
+  private prependWithSeparator(
+    base: string,
+    prefix: string,
+    separator: '_' | '.',
+  ): string | null {
+    const maxBaseLength = 20 - prefix.length - separator.length;
+    if (maxBaseLength < 3) {
+      return null;
+    }
+
+    const trimmedBase = this.trimTrailingSeparators(base).slice(
+      0,
+      maxBaseLength,
+    );
+    if (trimmedBase.length < 3) {
+      return null;
+    }
+
+    return `${prefix}${separator}${trimmedBase}`;
+  }
+
+  private buildSuggestionCandidates(base: string): string[] {
+    const separator: '_' | '.' = base.includes('.') ? '.' : '_';
+    const candidates: Array<string | null> = [];
+
+    for (const suffix of SUGGESTION_SUFFIXES) {
+      candidates.push(this.appendWithSeparator(base, suffix, separator));
+    }
+
+    candidates.push(this.prependWithSeparator(base, 'the', separator));
+    candidates.push(this.prependWithSeparator(base, 'real', separator));
+    candidates.push(this.appendCompact(base, 'app'));
+    candidates.push(this.appendCompact(base, 'hq'));
+    candidates.push(this.appendCompact(base, 'live'));
+
+    const uniqueCandidates = Array.from(
+      new Set(
+        candidates.filter(
+          (candidate): candidate is string => candidate !== null,
+        ),
+      ),
+    );
+
+    return uniqueCandidates.filter((candidate) =>
+      USERNAME_PATTERN.test(candidate),
+    );
+  }
+
+  async suggestAvailableUsernames(
+    username: string,
+    isAvailable: (candidate: string) => Promise<boolean>,
+    limit = 5,
+  ): Promise<string[]> {
+    const base = this.sanitizeSuggestionBase(username);
+    const candidates = this.buildSuggestionCandidates(base);
+    const suggestions: string[] = [];
+
+    for (const candidate of candidates) {
+      if (suggestions.length >= limit) {
+        break;
+      }
+
+      const available = await isAvailable(candidate);
+      if (available && candidate !== username) {
+        suggestions.push(candidate);
+      }
+    }
+
+    return suggestions;
   }
 
   toJson(): string {
