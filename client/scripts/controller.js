@@ -52,10 +52,18 @@ export function createUsernameController(ui) {
     renderSuggestions(ui, availability.suggestions, (selected) => {
       ui.usernameInput.value = selected;
       clearSuggestions(ui);
-      setStatus(ui, `Selected @${selected}. Click Check and Save to reserve it.`, 'ok');
+      setStatus(
+        ui,
+        `Selected @${selected}. Click Check and Save to reserve it.`,
+        'ok',
+      );
       ui.usernameInput.focus();
     });
-    setStatus(ui, 'That username is taken. Try one of these available options.', 'error');
+    setStatus(
+      ui,
+      'That username is taken. Try one of these available options.',
+      'error',
+    );
 
     return availability;
   }

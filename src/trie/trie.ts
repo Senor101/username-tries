@@ -8,20 +8,25 @@ class TrieNode {
   }
 }
 
-const USERNAME_PATTERN = /^[a-z0-9_.]{3,20}$/;
-const SUGGESTION_SUFFIXES = [
+const USERNAME_PATTERN = /^[a-z0-9_.]{3,30}$/;
+const BRAND_SUFFIXES = [
   'official',
-  'studio',
-  'creative',
-  'writes',
-  'media',
-  'hub',
+  'hq',
   'team',
+  'studio',
+  'labs',
+  'media',
+  'global',
+  'collective',
+  'network',
+  'works',
+  'community',
   'app',
   'dev',
-  'lab',
-  'works',
+  'daily',
 ];
+
+const TRUST_PREFIXES = ['real', 'the', 'its'];
 
 class Trie {
   root: TrieNode;
@@ -113,6 +118,13 @@ class Trie {
     return cleaned.length > 0 ? cleaned.slice(0, 14) : 'user';
   }
 
+  private tokenizeBase(base: string): string[] {
+    return base
+      .split(/[._]+/)
+      .map((segment) => segment.trim())
+      .filter((segment) => segment.length > 0);
+  }
+
   private trimTrailingSeparators(value: string): string {
     return value.replace(/[._]+$/g, '');
   }
@@ -122,7 +134,7 @@ class Trie {
     suffix: string,
     separator: '_' | '.',
   ): string | null {
-    const maxBaseLength = 20 - separator.length - suffix.length;
+    const maxBaseLength = 30 - separator.length - suffix.length;
     if (maxBaseLength < 3) {
       return null;
     }
@@ -140,7 +152,7 @@ class Trie {
 
   private appendCompact(base: string, suffix: string): string | null {
     const compactBase = base.replace(/[._]+/g, '');
-    const maxBaseLength = 20 - suffix.length;
+    const maxBaseLength = 30 - suffix.length;
     if (maxBaseLength < 3) {
       return null;
     }
@@ -158,7 +170,7 @@ class Trie {
     prefix: string,
     separator: '_' | '.',
   ): string | null {
-    const maxBaseLength = 20 - prefix.length - separator.length;
+    const maxBaseLength = 30 - prefix.length - separator.length;
     if (maxBaseLength < 3) {
       return null;
     }
@@ -176,17 +188,51 @@ class Trie {
 
   private buildSuggestionCandidates(base: string): string[] {
     const separator: '_' | '.' = base.includes('.') ? '.' : '_';
+    const compactBase = base.replace(/[._]+/g, '');
+    const tokens = this.tokenizeBase(base);
+    const mergedTokens = tokens.join('');
+    const initials = tokens.map((token) => token[0]).join('');
+    const year = String(new Date().getFullYear());
     const candidates: Array<string | null> = [];
 
-    for (const suffix of SUGGESTION_SUFFIXES) {
+    for (const suffix of BRAND_SUFFIXES) {
       candidates.push(this.appendWithSeparator(base, suffix, separator));
     }
 
-    candidates.push(this.prependWithSeparator(base, 'the', separator));
-    candidates.push(this.prependWithSeparator(base, 'real', separator));
+    for (const prefix of TRUST_PREFIXES) {
+      candidates.push(this.prependWithSeparator(base, prefix, separator));
+    }
+
+    candidates.push(this.appendWithSeparator(base, year, separator));
     candidates.push(this.appendCompact(base, 'app'));
     candidates.push(this.appendCompact(base, 'hq'));
     candidates.push(this.appendCompact(base, 'live'));
+
+    if (mergedTokens.length >= 3) {
+      candidates.push(this.appendWithSeparator(mergedTokens, 'official', '_'));
+      candidates.push(this.appendWithSeparator(mergedTokens, 'team', '_'));
+      candidates.push(this.appendWithSeparator(mergedTokens, year, '_'));
+    }
+
+    if (tokens.length >= 2) {
+      const firstAndLast = `${tokens[0]}${separator}${tokens[tokens.length - 1]}`;
+      candidates.push(
+        this.appendWithSeparator(firstAndLast, 'official', separator),
+      );
+      candidates.push(
+        this.appendWithSeparator(firstAndLast, 'works', separator),
+      );
+    }
+
+    if (initials.length >= 3) {
+      candidates.push(this.appendWithSeparator(initials, 'team', '_'));
+      candidates.push(this.appendWithSeparator(initials, 'dev', '_'));
+    }
+
+    if (compactBase.length >= 3) {
+      candidates.push(this.prependWithSeparator(compactBase, 'join', '_'));
+      candidates.push(this.prependWithSeparator(compactBase, 'hello', '_'));
+    }
 
     const uniqueCandidates = Array.from(
       new Set(

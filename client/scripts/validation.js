@@ -20,7 +20,7 @@ export function validateUsername(username) {
       valid: false,
       normalized,
       reason:
-        'Invalid format. Use 3-20 chars: lowercase letters, numbers, underscore, dot.',
+        'Invalid format. Use 3-30 chars: lowercase letters, numbers, underscore, dot.',
     };
   }
 

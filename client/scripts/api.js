@@ -1,7 +1,11 @@
 import { API_BASE } from './config.js';
 
 function readMessageFromPayload(payload) {
-  if (payload && typeof payload.message === 'string' && payload.message.length > 0) {
+  if (
+    payload &&
+    typeof payload.message === 'string' &&
+    payload.message.length > 0
+  ) {
     return payload.message;
   }
 
@@ -11,7 +15,9 @@ function readMessageFromPayload(payload) {
 function normalizeClientError(error, fallbackMessage) {
   if (error instanceof Error) {
     if (error.name === 'TypeError') {
-      return new Error('Network error. Please check your connection and retry.');
+      return new Error(
+        'Network error. Please check your connection and retry.',
+      );
     }
 
     return error;
