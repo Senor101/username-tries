@@ -23,6 +23,8 @@ fastifyApp.register(usernameRoutes, { prefix: '/api/v1' });
 
 async function startServer() {
   await initializeDatabase();
+
+  // Hydrate the in-memory trie with existing usernames from the database before starting the server
   await hydrateUsernameTrie();
   await fastifyApp.listen({ port: appConfig.port, host: appConfig.host });
 }
