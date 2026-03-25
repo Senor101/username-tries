@@ -212,3 +212,14 @@ This project is a compact example of combining:
 - Usable client experience
 
 It gives you a practical base to evolve into a production-grade username service or adapt Trie patterns for other string-heavy real-world problems.
+
+## Video Demo
+
+<video controls width="900" preload="metadata">
+  <source src="https://res.cloudinary.com/dsyoenswr/video/upload/v1774455860/blogs/username_tries_gj6k8y.mov" type="video/quicktime" />
+  Your browser does not support the video tag.
+</video>
+
+If the player does not render in your Markdown viewer, use this direct link:
+
+https://res.cloudinary.com/dsyoenswr/video/upload/v1774455860/blogs/username_tries_gj6k8y.mov
