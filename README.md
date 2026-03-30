@@ -217,5 +217,5 @@ It gives you a practical base to evolve into a production-grade username service
 
 https://github.com/user-attachments/assets/47479767-16a9-4146-bee1-ce5bebb55160
 
-
-
+If you want to look further on how you can use tries and gain more insights. Please refer to this blog.
+https://www.dikshyanta.com.np/blogs/tries
